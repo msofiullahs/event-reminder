@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->bigInteger('event_id');
             $table->string('email');
+            $table->enum('sent_status', ['pending', 'sent'])->default('pending');
             $table->timestamps();
         });
     }
