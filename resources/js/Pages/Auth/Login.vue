@@ -1,12 +1,18 @@
 <script setup>
+import { ref } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AuthenticationCard from '@/Components/AuthenticationCard.vue';
 import AuthenticationCardLogo from '@/Components/AuthenticationCardLogo.vue';
-import Checkbox from '@/Components/Checkbox.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faEye, faEyeSlash } from '@fortawesome/free-regular-svg-icons';
+
+library.add(
+    faEye,
+    faEyeSlash,
+)
 
 defineProps({
     canResetPassword: Boolean,
@@ -27,6 +33,11 @@ const submit = () => {
         onFinish: () => form.reset('password'),
     });
 };
+
+let seePassword = ref(false);
+const passwordToggle = () => {
+    seePassword.value = !seePassword.value;
+}
 </script>
 
 <template>
@@ -42,48 +53,76 @@ const submit = () => {
         </div>
 
         <form @submit.prevent="submit">
-            <div>
-                <InputLabel for="email" value="Email" />
-                <TextInput
-                    id="email"
-                    v-model="form.email"
-                    type="email"
-                    class="mt-1 block w-full"
-                    required
-                    autofocus
-                    autocomplete="username"
-                />
-                <InputError class="mt-2" :message="form.errors.email" />
+            <div class="mb-3 row">
+                <InputLabel for="email" value="Email" class="col-sm-3 col-form-label" />
+                <div class="col-sm-9">
+                    <TextInput
+                        id="email"
+                        v-model="form.email"
+                        type="email"
+                        class="form-control"
+                        required
+                        autofocus
+                        autocomplete="username"
+                    />
+                    <InputError :message="form.errors.email" />
+                </div>
             </div>
 
-            <div class="mt-4">
-                <InputLabel for="password" value="Password" />
-                <TextInput
-                    id="password"
-                    v-model="form.password"
-                    type="password"
-                    class="mt-1 block w-full"
-                    required
-                    autocomplete="current-password"
-                />
-                <InputError class="mt-2" :message="form.errors.password" />
+            <div class="mb-3 row">
+                <InputLabel for="password" value="Password" class="col-sm-3 col-form-label" />
+                <div class="col-sm-9">
+                    <div class="input-group">
+                        <TextInput
+                            v-if="seePassword"
+                            id="password"
+                            v-model="form.password"
+                            type="text"
+                            class="form-control"
+                            required
+                            autocomplete="current-password"
+                        />
+                        <TextInput
+                            v-else
+                            id="password"
+                            v-model="form.password"
+                            type="password"
+                            class="form-control"
+                            required
+                            autocomplete="current-password"
+                        />
+                        <button class="btn btn-outline-secondary" type="button" @click="passwordToggle">
+                            <font-awesome-icon :icon="['far', seePassword ? 'eye-slash' : 'eye']" />
+                        </button>
+                    </div>
+                    <InputError :message="form.errors.password" />
+                </div>
             </div>
 
-            <div class="block mt-4">
-                <label class="flex items-center">
+            <div class="row mb-3">
+                <div class="col-sm-3"></div>
+                <div class="col-sm-9">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" v-model="form.remember" name="remember" id="flexCheckDefault">
+                        <label class="form-check-label" for="flexCheckDefault">
+                            Remember me
+                        </label>
+                    </div>
+                </div>
+                <!-- <label class="flex items-center">
                     <Checkbox v-model:checked="form.remember" name="remember" />
-                    <span class="ms-2 text-sm text-gray-600">Remember me</span>
-                </label>
+                    <span class="ml-2 text-sm text-gray-600">Remember me</span>
+                </label> -->
             </div>
 
-            <div class="flex items-center justify-end mt-4">
+            <div class="d-flex justify-content-between align-items-center">
                 <Link v-if="canResetPassword" :href="route('password.request')" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                     Forgot your password?
                 </Link>
 
-                <PrimaryButton class="ms-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
+                <button class="btn btn-outline-light" type="submit" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
                     Log in
-                </PrimaryButton>
+                </button>
             </div>
         </form>
     </AuthenticationCard>
