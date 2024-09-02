@@ -2,11 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\EventImport;
+use App\Imports\ImportEvent;
 use Illuminate\Http\Request;
 use App\Models\Event;
 use App\Models\Receiver;
 use Carbon\Carbon;
+use Exception;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+use Maatwebsite\Excel\Facades\Excel;
 
 class EventController extends Controller
 {
@@ -56,11 +61,7 @@ class EventController extends Controller
      */
     public function store(Request $request)
     {
-        $uniqueId = 'EVT'.str_pad('1', 10, '0', STR_PAD_LEFT);
-        $latest = Event::latest()->first();
-        if (!empty($latest)) {
-            $uniqueId = 'EVT'.str_pad($latest->id+1, 10, '0', STR_PAD_LEFT);
-        }
+        $uniqueId = $this->uniqueId();
 
         $data = new Event();
         $data->unique_id = $uniqueId;
@@ -143,5 +144,56 @@ class EventController extends Controller
         $event->receivers()->delete();
         $event->delete();
         return back();
+    }
+
+    /**
+     * Import CSV file to storage.
+     */
+    public function importEvents(Request $request)
+    {
+        try {
+            if ($request->file('file')->getClientOriginalExtension() == 'csv') {
+                // Handle CSV file
+                $data = array_map('str_getcsv', file($request->file('file')));
+                // dd($data);
+                $newArr = [];
+                foreach ($data as $key => $val) {
+                    if ($key > 0) {
+                        $item = $val[0];
+                        $separator = ',';
+                        if (strpos($item, ';')) {
+                            $separator = ';';
+                        }
+                        $columns = explode($separator, $item);
+                        $uniqueId = $this->uniqueId();
+                        $event = new Event();
+                        $event->unique_id = $uniqueId;
+                        $event->title = $columns[0];
+                        $event->type = $columns[1];
+                        $event->location = $columns[2];
+                        $event->event_date = $columns[3];
+                        $event->send_reminder_time = $columns[4];
+                        $event->save();
+                    }
+                }
+            } else {
+                // Handle Excel file
+                Excel::import(new EventImport, $request->file('file'));
+            }
+            return back()->with('posted', 'success');
+        } catch (Exception $e) {
+            Log::info($e);
+            return back()->with('posted', 'failed');
+        }
+    }
+
+    function uniqueId()
+    {
+        $uniqueId = 'EVT'.str_pad('1', 10, '0', STR_PAD_LEFT);
+        $latest = Event::latest()->first();
+        if (!empty($latest)) {
+            $uniqueId = 'EVT'.str_pad($latest->id+1, 10, '0', STR_PAD_LEFT);
+        }
+        return $uniqueId;
     }
 }

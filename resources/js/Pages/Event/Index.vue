@@ -5,6 +5,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import Pagination from '@/Components/Pagination.vue';
 import moment from 'moment-timezone';
 import FormEvent from './FormEvent.vue';
+import FormImport from './FormImport.vue';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faMagnifyingGlassArrowRight } from '@fortawesome/free-solid-svg-icons';
 import { faPenToSquare, faTrashCan, faEye } from '@fortawesome/free-regular-svg-icons';
@@ -40,6 +41,10 @@ const formEvent = (itemId) => {
         formModal.value.showModal();
     }
 }
+let importModal = ref(null);
+const formImport = () => {
+    importModal.value.showModal();
+}
 
 const renderComponent = ref(true);
 const reloadTable = async () => {
@@ -57,7 +62,10 @@ const deleteItem = (id) => {
     <AppLayout title="Dashboard">
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="h2">Event Reminders</h1>
-            <button type="button" class="btn btn-outline-light" @click="formEvent(0)">Add</button>
+            <div>
+                <button type="button" class="btn btn-outline-light" @click="formEvent(0)">Add</button>
+                <button type="button" class="btn btn-outline-light ms-3" @click="formImport()">Import</button>
+            </div>
         </div>
 
         <div class="d-flex justify-content-between mb-3">
@@ -141,5 +149,6 @@ const deleteItem = (id) => {
 
         <Pagination v-if="events.data.length > 0" class="mt-5" :links="events.links" />
         <FormEvent ref="formModal" @posted="reloadTable"></FormEvent>
+        <FormImport ref="importModal" @posted="reloadTable"></FormImport>
     </AppLayout>
 </template>

@@ -1,11 +1,10 @@
 <script setup>
-import { onMounted, reactive, ref, watch } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useForm, router } from '@inertiajs/vue3';
 import { Modal } from 'bootstrap';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
-import axios from 'axios';
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 

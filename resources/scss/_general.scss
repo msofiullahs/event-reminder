@@ -2,10 +2,19 @@
 body {
     font-family: 'Ubuntu', sans-serif;
     font-weight: 300;
-}
 
-.dp__input {
-    background-color: var(--bs-body-bg) !important;
-    border-color: var(--bs-border-color) !important;
-    border-radius: var(--bs-border-radius) !important;
+    .dp__input {
+        background-color: var(--bs-body-bg) !important;
+        border-color: var(--bs-border-color) !important;
+        border-radius: var(--bs-border-radius) !important;
+    }
+
+    .custom-dropzone {
+        border-style: dashed;
+        border-width: 3px;
+        padding: 20px;
+        color:rgb(114, 114, 114);
+        height: 15rem;
+        border-radius: var(--bs-border-radius);
+    }
 }
